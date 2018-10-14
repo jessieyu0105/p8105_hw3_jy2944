@@ -118,14 +118,21 @@ _4. For each year and state, compute the average proportion in each response cat
 
 ```{r p1_4}
 brfss_data %>% 
+  # group by year, state, and response
   group_by(year, state_abbr, response) %>% 
   summarise(mean = mean(data_value, na.rm = TRUE)) %>% 
+  # Boxplot, group by year
   ggplot(aes(x = year, y = mean, group = year)) +
   geom_boxplot() +
   labs(
-    title = "Average proportion in each response category", 
+    title = "State-level average proportion in each response category from 2002 to 2010", 
     x = "Year", 
     y = "Average Proportion"
-    ) 
+    ) +
+  # faceting: divide the plot into 5 subplots based on response category
+  facet_grid(. ~ response) +
+  theme(axis.text.x = element_text(angle = 90))
 ```
+
+
 
