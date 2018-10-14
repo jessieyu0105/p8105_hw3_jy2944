@@ -97,6 +97,7 @@ brfss_data %>%
   distinct(location) %>% 
   summarise(number = n()) %>%
   filter(year == 2007 | year == 2010) %>% 
+  # arrange in a decreasing order
   arrange(desc(number)) %>% 
   head(5) %>% 
   knitr::kable()
@@ -149,4 +150,105 @@ brfss_data %>%
 
 In each response category, the distributions of state-level average proportion are not much different between years, but the occurance of outliers is different in each year. There are more outliers appeared in the "Poor" response category compared to other category. 
 
+
+
+# Problem 2
+
+This problem uses the Instacart data.
+
+Load data
+```{r insta_data}
+instacart_data = as.tibble(p8105.datasets::instacart) %>%
+   janitor::clean_names()
+```
+
+### Description of the dataset
+
+### Answers based on the dataset
+
+_1. How many aisles are there, and which aisles are the most items ordered from?_
+
+```{r p2_1, collapse = TRUE}
+# find the number of distinct aisles
+instacart_data %>% 
+  distinct(aisle_id, aisle) %>% 
+  nrow()
+
+# find which aisles are the most items ordered from
+instacart_data %>% 
+  group_by(aisle_id, aisle) %>% 
+  summarize(n = n()) %>% 
+  # arrange in a decreasing order
+  arrange(desc(n)) %>% 
+  head(5) %>% 
+  knitr::kable()
+```
+
+There are `r instacart_data %>% distinct(aisle_id, aisle) %>% nrow()` distinct aisles. The above table shows the top 5 most popular aisles. Among them, "fresh vegetables" and "fresh fruits" are the aisles where most items are ordered from, followed by "packaged vegetable fruit", "yogurt", and "packaged cheese".
+
+
+_2. Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it._
+
+```{r p2_2, warning = FALSE}
+instacart_data %>% 
+  group_by(aisle_id, aisle) %>% 
+  summarise(number = n()) %>% 
+  mutate(aisle = forcats::fct_reorder(aisle, number)) %>%
+  ggplot(aes(x = aisle, y = number, fill = aisle)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Number of items ordered in each aisle",
+    x = "Aisle",
+    y = "Number of items ordered"
+  ) +
+  viridis::scale_color_viridis(
+    discrete = TRUE,
+    name = "Aisle"
+    ) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "none"
+    )
+```
+
+
+Comments?
+
+
+_3. Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”._
+
+```{r p2_3}
+instacart_data %>% 
+  # filter the three aisles
+  filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>%
+  group_by(aisle, product_name) %>% 
+  summarize(number = n()) %>% 
+  # display the most popular item in each aisle
+  top_n(1, number) %>% 
+  knitr::kable()
+```
+
+"Light Brown Sugar" is the most popular item in the aisle "Baking Ingredients" with a sale volume of 499 packets. "Snack Sticks Chicken & Rice Recipe Dog Treats" is the most popular item in the aisle "Dog Food Care" with a sale volume of 30 bags. In the aisle “Packaged Vegetables fruits”, the most popular item is "Organic Baby Spinach" and it reaches a sale of 9784 packages.
+
+
+_4. Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table)_
+
+```{r 2_4}
+instacart_data %>% 
+  # filter the 2 products
+  filter(product_name == "Pink Lady Apples" | product_name == "Coffee Ice Cream") %>%
+  # order_dow:  the day of the week on which the order was placed
+  group_by(product_name, order_dow) %>% 
+  summarize(mean_hour = mean(order_hour_of_day)) %>%
+  mutate(
+    order_dow = factor(order_dow),
+    # make the values in `order_dow` readable
+    order_dow = recode(order_dow, "0" = "Sunday", "1" = "Monday", "2" = "Tuesday", "3" = "Wednesday", "4" = "Thursday", "5" = "Friday", "6" = "Saturday")
+    ) %>%
+  # format the table for human readers
+  spread(key = order_dow, value = mean_hour) %>%
+  knitr::kable(digits = 2)
+```
+
+As to Coffee Ice Cream, the mean hour for it to be ordered is highest on Tuesday (15.38 hours), and lowest on Friday (12.26 hours). As to Pink Lady Apples, the mean hour for it to be ordered is highest on Wednesday (14.25 hours), and lowest on Monday (11.36 hours).
 
