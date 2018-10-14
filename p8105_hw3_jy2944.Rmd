@@ -181,6 +181,7 @@ instacart_data %>%
   # arrange in a decreasing order
   arrange(desc(n)) %>% 
   head(5) %>% 
+  rename("Aisle id" = aisle_id, "Aisle Name" = aisle, "Number" = n) %>%
   knitr::kable()
 ```
 
@@ -225,6 +226,7 @@ instacart_data %>%
   summarize(number = n()) %>% 
   # display the most popular item in each aisle
   top_n(1, number) %>% 
+  rename("Aisle" = aisle, "Product Name" = product_name, "Sale Volume" = number) %>%
   knitr::kable()
 ```
 
@@ -247,6 +249,7 @@ instacart_data %>%
     ) %>%
   # format the table for human readers
   spread(key = order_dow, value = mean_hour) %>%
+  rename("Product Name" = product_name) %>%
   knitr::kable(digits = 2)
 ```
 
