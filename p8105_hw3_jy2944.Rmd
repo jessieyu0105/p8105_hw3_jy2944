@@ -11,6 +11,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(ggridges)
+library(patchwork)
 
 # download p8105.datasets
 devtools::install_github("p8105/p8105.datasets")
@@ -29,9 +31,7 @@ This problem uses the BRFSS data.
 
 ```{r brfss_data, warning = FALSE, message = FALSE}
 
-data("brfss_smart2010")
-
-brfss_data = brfss_smart2010 %>%
+brfss_data = as.tibble(brfss_smart2010) %>%
   janitor::clean_names() %>%
   # format the data to use appropriate variable names
   separate(locationdesc, into = c("state_str", "location"), sep = " - ") %>%
@@ -158,7 +158,7 @@ This problem uses the Instacart data.
 
 Load data
 ```{r insta_data}
-instacart_data = as.tibble(p8105.datasets::instacart) %>%
+instacart_data = as.tibble(instacart) %>%
    janitor::clean_names()
 ```
 
@@ -254,4 +254,110 @@ instacart_data %>%
 ```
 
 As to Coffee Ice Cream, the mean hour for it to be ordered is highest on Tuesday (15.38 hours), and lowest on Friday (12.26 hours). As to Pink Lady Apples, the mean hour for it to be ordered is highest on Wednesday (14.25 hours), and lowest on Monday (11.36 hours).
+
+
+
+# Problem 3
+
+This problem uses the NY NOAA data.
+
+Load data
+
+```{r}
+noaa_data = as.tibble(ny_noaa) %>%
+  janitor::clean_names()
+```
+
+### Description
+
+
+### Answers based on the dataset
+
+_1. Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?_
+
+```{r p3_1, collapse = TRUE}
+# data cleaning
+noaa_data = noaa_data %>%
+  janitor::clean_names() %>%
+  # create separate variables for year, month, and day
+  separate(date, into = c("year", "month", "day")) %>%
+  # change the units to one-tenth
+  mutate(
+    prcp = prcp / 10, 
+    tmax = as.numeric(tmax) / 10, 
+    tmin = as.numeric(tmin) / 10
+  ) 
+
+# find the most commonly ovserved values for snowfall
+noaa_data %>% 
+  group_by(snow) %>% 
+  summarize(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  head(5) %>% 
+  knitr::kable()
+```
+
+The most commonly observed value for snowfall is 0 mm, because it does not snow in most days of the year in New York.
+
+
+_2. Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?_
+
+```{r p3_2, warning = FALSE}
+noaa_data %>% 
+  # filter by January and July
+  filter(month == "01" | month == "07") %>%
+  # make month name readable
+  mutate(month = recode(month, "01" = "January", "07" = "July")) %>%
+  # group by id (station), year, month
+  group_by(id, year, month) %>% 
+  summarise(mean_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  # spaghetti plot
+  ggplot(aes(x = year, y = mean_tmax, group = id, color = id)) + 
+  geom_point(alpha = 0.5) + 
+  geom_line(alpha = 0.5) + 
+  labs(
+    title = "Average max temperature in January and July in each station from 1981 to 2010",
+    x = "Year",
+    y = "Average max temperature (ºC)"
+  ) +
+  viridis::scale_color_viridis(discrete = TRUE) +
+  # facetting by month
+  facet_grid(. ~ month) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "none"
+    )
+```
+
+We can learn from above plot that the average max temperature in January were lower a lot than that in July. The average max temperature in January by station across years centered around 0 ºC, and were between -10 ºC and 10 ºC, while the average max temperature in July by station across years centered around 28 ºC, and were between 20 ºC and 35 ºC. There are a few outliers in both the distributions of January and July.
+
+
+_3. Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year._
+
+```{r p3_3}
+tmax_tmin_hex = noaa_data %>% 
+  ggplot(aes(x = tmax, y = tmin)) +
+  geom_hex() +
+  labs(
+    title = "Maximum vs. minimum Temperatures from 1981 to 2010", 
+    x = "Maximum temperature (ºC)", 
+    y = "Minimum temperature (ºC)"
+  ) +
+  theme(legend.position = "bottom")
+
+snow_ridge = noaa_data %>% 
+  filter(snow > 0 & snow < 100) %>% 
+  ggplot(aes(x = snow, y = year)) +
+  geom_density_ridges(scale = .85) +
+  labs(
+    title = "Distribution of snowfall between 0 and 100 mm from 1981 to 2010",
+    x = "Snowfall (mm)",
+    y = "Year"
+    )
+  
+tmax_tmin_hex + snow_ridge
+```
+
+We can learn from the plot on the left that the maximum temperatures was positively correlated to the minimum temperatures at New York across years. The plot on the right shows that the distributions of snowfall values from 0 to 100 mm were all skewed to right in each year. From 0 to 100 mm (not include 0 and 100 mm), the most commonly observed values of snowfall were about 10 mm and 25 mm.
+
 
