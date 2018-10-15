@@ -244,15 +244,18 @@ _2. Make a plot that shows the number of items ordered in each aisle. Order aisl
 
 ```{r p2_2, warning = FALSE}
 instacart_data %>% 
-  group_by(aisle_id, aisle) %>% 
+  # group by department and aisle
+  group_by(department, aisle) %>% 
   summarise(number = n()) %>% 
-  mutate(aisle = forcats::fct_reorder(aisle, number)) %>%
-  ggplot(aes(x = aisle, y = number, fill = aisle)) +
+  # barplot
+  # reorder the aisle by number of items
+  ggplot(aes(x = reorder(aisle, -number), y = number, fill = department)) +
   geom_bar(stat = "identity") +
   labs(
     title = "Number of items ordered in each aisle",
     x = "Aisle",
-    y = "Number of items ordered"
+    y = "Number of items ordered",
+    fill = "Department"
   ) +
   viridis::scale_color_viridis(
     discrete = TRUE,
@@ -260,12 +263,13 @@ instacart_data %>%
     ) +
   theme(
     axis.text.x = element_text(angle = 90),
-    legend.position = "none"
+    axis.text = element_text(size = 7.5),
+    legend.position = "bottom"
     )
 ```
 
 
-Comments?
+From the above barplot, we can find that the three most popular aisles are "fresh vegetables", "fresh fruits", and "packaged vegetable fruits", and they all belong to the department "Produce". "Yogurt" and "packaged cheese" are the fourth and fifth most popular aisles, and both of them belong to the department "Dairy eggs".
 
 
 _3. Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”._
@@ -276,8 +280,9 @@ instacart_data %>%
   filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>%
   group_by(aisle, product_name) %>% 
   summarize(number = n()) %>% 
+  arrange(desc(number)) %>%
   # display the most popular item in each aisle
-  top_n(1, number) %>% 
+  top_n(1) %>% 
   rename("Aisle" = aisle, "Product Name" = product_name, "Sale Volume" = number) %>%
   knitr::kable()
 ```
