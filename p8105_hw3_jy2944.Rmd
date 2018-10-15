@@ -263,7 +263,7 @@ instacart_data %>%
     ) +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
-    axis.text = element_text(size = 7),
+    axis.text = element_text(size = 6.5),
     legend.position = "bottom"
     )
 ```
