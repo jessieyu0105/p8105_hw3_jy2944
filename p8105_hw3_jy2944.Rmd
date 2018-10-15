@@ -243,7 +243,7 @@ There are `r instacart_data %>% distinct(aisle_id, aisle) %>% nrow()` distinct a
 _2. Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it._
 
 ```{r p2_2, warning = FALSE}
-instacart_data %>% 
+aisle_plot = instacart_data %>% 
   # group by department and aisle
   group_by(department, aisle) %>% 
   summarise(number = n()) %>% 
@@ -263,9 +263,37 @@ instacart_data %>%
     ) +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
-    axis.text = element_text(size = 6.5),
-    legend.position = "bottom"
+    axis.text = element_text(size = 7),
+    legend.position = "right"
     )
+
+insta_new = instacart_data %>% 
+  # group by department and aisle
+  group_by(department, aisle) %>% 
+  summarise(number = n()) %>% 
+  arrange(desc(number))
+
+top_10_aisle = insta_new[c(1:10), ] %>% 
+  # barplot
+  # reorder the aisle by number of items
+  ggplot(aes(x = reorder(aisle, -number), y = number, fill = department)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Numbers of items orderd in the 10 most popular aisles",
+    x = "Aisle",
+    y = "Number of items ordered",
+    fill = "Department"
+  ) +
+  viridis::scale_color_viridis(
+    discrete = TRUE,
+    name = "Aisle"
+    ) +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "right"
+    )
+
+aisle_plot / top_10_aisle
 ```
 
 
