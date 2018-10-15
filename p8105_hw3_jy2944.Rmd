@@ -252,7 +252,7 @@ aisle_plot = instacart_data %>%
   ggplot(aes(x = reorder(aisle, -number), y = number, fill = department)) +
   geom_bar(stat = "identity") +
   labs(
-    title = "Number of items ordered in each aisle",
+    title = "Number of items ordered in each aisle (by department)",
     x = "Aisle",
     y = "Number of items ordered",
     fill = "Department"
@@ -264,7 +264,8 @@ aisle_plot = instacart_data %>%
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
     axis.text = element_text(size = 7),
-    legend.position = "none"
+    legend.position = "none",
+    plot.title = element_text(size = 10)
     )
 
 insta_new = instacart_data %>% 
@@ -279,7 +280,7 @@ top_10_aisle = insta_new[c(1:10), ] %>%
   ggplot(aes(x = reorder(aisle, -number), y = number, fill = department)) +
   geom_bar(stat = "identity") +
   labs(
-    title = "Numbers of items orderd in the 10 most popular aisles",
+    title = "Numbers of items orderd in the 10 most popular aisles (by department)",
     x = "Aisle",
     y = "Number of items ordered",
     fill = "Department"
@@ -290,19 +291,20 @@ top_10_aisle = insta_new[c(1:10), ] %>%
     ) +
   theme(
     axis.text.x = element_text(angle = 30, hjust = 1),
-    legend.position = "right"
+    legend.position = "right",
+    plot.title = element_text(size = 10)
     )
 
 gridExtra::grid.arrange(aisle_plot, top_10_aisle, heights = c(6, 4), nrow = 2 )
 ```
 
 
-From the above barplot, we can find that the three most popular aisles are "fresh vegetables", "fresh fruits", and "packaged vegetable fruits", and they all belong to the department "Produce". "Yogurt" and "packaged cheese" are the fourth and fifth most popular aisles, and both of them belong to the department "Dairy eggs".
+From the above first barplot, we learn that all of the three most popular aisles belong to one department, and both of the fourth and fifth most popular aisles belong to another department. Then I made above second barplot to have a clear look. We find out that the three most popular aisles are "fresh vegetables", "fresh fruits", and "packaged vegetable fruits", and they all belong to the department "Produce". "Yogurt" and "packaged cheese" are the fourth and fifth most popular aisles, and both of them belong to the department "Dairy eggs".
 
 
 _3. Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”._
 
-```{r p2_3}
+```{r p2_3, message = FALSE}
 instacart_data %>% 
   # filter the three aisles
   filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>%
@@ -315,7 +317,7 @@ instacart_data %>%
   knitr::kable()
 ```
 
-"Light Brown Sugar" is the most popular item in the aisle "Baking Ingredients" with a sale volume of 499 packets. "Snack Sticks Chicken & Rice Recipe Dog Treats" is the most popular item in the aisle "Dog Food Care" with a sale volume of 30 bags. In the aisle “Packaged Vegetables fruits”, the most popular item is "Organic Baby Spinach" and it reaches a sale of 9784 packages.
+In the aisle “Packaged Vegetables fruits”, the most popular item is "Organic Baby Spinach" and it reaches a sale of 9784 packages. "Light Brown Sugar" is the most popular item in the aisle "Baking Ingredients" with a sale volume of 499 packets. "Snack Sticks Chicken & Rice Recipe Dog Treats" is the most popular item in the aisle "Dog Food Care" with a sale volume of 30 bags.
 
 
 _4. Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table)_
@@ -376,7 +378,7 @@ noaa_data %>%
 
 This dataset contains daily weather information observed by each New York state weather station from January 1, 1981 through December 31, 2010. It is consisted by `r nrow(noaa_data)` observations with information across `r ncol(noaa_data)` variables. Key variables include the date of observation, precipitation (tenths of mm), snowfall (mm), maximum temperature (tenths of degrees centigrade), and minimum temperature (tenths of degrees centigrade).
 
-One big issue of this dataset is that it contains extensive missing data. In variable precipitation, snowfall, snow depth, maximum temperature, and minimum temperature, the missing data accounts for `r round((sum(is.na(noaa_data$prcp)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$snow)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$snwd)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$tmax)) / nrow(noaa_data)) * 100, 2)`%, and `r round((sum(is.na(noaa_data$tmin)) / nrow(noaa_data)) * 100, 2)`%, respectively. There are `r noaa_data %>% filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% nrow()` observations are missing at least information of one weather variable, which accounts for `r round(((noaa_data %>% filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% nrow()) / nrow(noaa_data)) * 100, 2)`% of the all observations (over a half).
+One big issue of this dataset is that it contains extensive missing data. In variable precipitation, snowfall, snow depth, maximum temperature, and minimum temperature, the missing data accounts for `r round((sum(is.na(noaa_data$prcp)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$snow)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$snwd)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$tmax)) / nrow(noaa_data)) * 100, 2)`%, and `r round((sum(is.na(noaa_data$tmin)) / nrow(noaa_data)) * 100, 2)`%, respectively. `r noaa_data %>% filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% nrow()` observations are missing at least information of one weather variable, which accounts for `r round(((noaa_data %>% filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% nrow()) / nrow(noaa_data)) * 100, 2)`% of the total observations (over a half).
 
 
 ### Answers based on the dataset
@@ -399,8 +401,9 @@ noaa_data = noaa_data %>%
 # find the most commonly ovserved values for snowfall
 noaa_data %>% 
   group_by(snow) %>% 
-  summarize(n = n()) %>% 
-  arrange(desc(n)) %>% 
+  summarize(number = n()) %>% 
+  arrange(desc(number)) %>% 
+  rename("snow value" = snow) %>%
   head(5) %>% 
   knitr::kable()
 ```
@@ -442,7 +445,7 @@ We can learn from above plot that the average max temperature in January were lo
 
 _3. Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year._
 
-```{r p3_3}
+```{r p3_3, warning = FALSE, message = FALSE}
 tmax_tmin_hex = noaa_data %>% 
   ggplot(aes(x = tmax, y = tmin)) +
   geom_hex() +
