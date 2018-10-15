@@ -20,6 +20,8 @@ library(p8105.datasets)
 
 theme_set(theme_bw())
 
+options(scipen = 200) # do not use scientific notation
+
 ```
 
 
@@ -156,13 +158,63 @@ In each response category, the distributions of state-level average proportion a
 
 This problem uses the Instacart data.
 
-Load data
-```{r insta_data}
+### Exploration of the dataset
+
+```{r insta_data, collapse = TRUE}
+# load the data
 instacart_data = as.tibble(instacart) %>%
    janitor::clean_names()
+
+# find the number of unique users
+instacart_data %>% 
+  distinct(user_id) %>% 
+  nrow()
+
+# find the number of distinct departments
+instacart_data %>% 
+  distinct(department_id, department) %>% 
+  nrow()
+
+# find the number of distinct products
+instacart_data %>% 
+  distinct(product_id, product_name) %>% 
+  nrow()
+
+# barplot: the day of the week on which the orders were placed
+barplot_day = instacart_data %>% 
+  mutate(
+    order_dow = factor(order_dow, levels = c(0:6)),
+    order_dow = recode(order_dow, "0" = "Sunday", "1" = "Monday", "2" = "Tuesday", "3" = "Wednesday", "4" = "Thursday", "5" = "Friday", "6" = "Saturday")
+    ) %>% 
+  ggplot(aes(x = order_dow)) +
+  geom_bar() +
+  labs(
+    title = "The day on which the orders were placed",
+    x = "The day of the week",
+    y = "Frequency"
+  ) +
+  theme(axis.text.x = element_text(angle = 90))
+  
+
+# histogram: the hour of the day on which the order was placed 
+histogram_hour = instacart_data %>% 
+  ggplot(aes(x = order_hour_of_day)) +
+  geom_histogram() +
+  labs(
+    title = "The hour on which the order was placed",
+    x = "The hour of the day",
+    y = "Frequency"
+    )
+
+barplot_day + histogram_hour
 ```
 
-### Description of the dataset
+The dataset contains information related to the Instacart online grocery shopping. It is consisted by `r nrow(instacart_data)` observations of `r instacart_data %>% distinct(user_id) %>% nrow()` unique users,  where each row in the dataset is a product from an order placed by an user. There are `r ncol(instacart_data)` variables, which contain the information of the product in each row. Key variables include "department", "aisle", "product name", "the day of the week on which the order was placed" (`order_dow`), and "the hour of the day on which the order was placed" (``order_hour_of_day``). 
+
+This online grocery is consisted of `r instacart_data %>% distinct(department_id, department) %>% nrow()` departments, and `r instacart_data %>% distinct(product_id, product_name) %>% nrow()` kinds of distinct products can be chosen from it.
+
+The above plots show that Sunday is the day of the week on which people place their orders most, and the majority of people prefer to place their order between 10 a.m. and 5 p.m.
+
 
 ### Answers based on the dataset
 
