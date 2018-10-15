@@ -447,6 +447,7 @@ _3. Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note th
 
 ```{r p3_3, warning = FALSE, message = FALSE}
 tmax_tmin_hex = noaa_data %>% 
+  # hexplot
   ggplot(aes(x = tmax, y = tmin)) +
   geom_hex() +
   labs(
@@ -454,17 +455,24 @@ tmax_tmin_hex = noaa_data %>%
     x = "Maximum temperature (ºC)", 
     y = "Minimum temperature (ºC)"
   ) +
-  theme(legend.position = "bottom")
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(angle = 90),
+    plot.title = element_text(size = 10)
+    
+        )
 
 snow_ridge = noaa_data %>% 
   filter(snow > 0 & snow < 100) %>% 
+  # ridge plot
   ggplot(aes(x = snow, y = year)) +
   geom_density_ridges(scale = .85) +
   labs(
     title = "Distribution of snowfall between 0 and 100 mm from 1981 to 2010",
     x = "Snowfall (mm)",
     y = "Year"
-    )
+    ) +
+  theme(plot.title = element_text(size = 10))
   
 tmax_tmin_hex + snow_ridge
 ```
