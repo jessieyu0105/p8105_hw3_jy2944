@@ -264,7 +264,7 @@ aisle_plot = instacart_data %>%
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
     axis.text = element_text(size = 7),
-    legend.position = "bottom"
+    legend.position = "right"
     )
 
 insta_new = instacart_data %>% 
@@ -290,10 +290,10 @@ top_10_aisle = insta_new[c(1:10), ] %>%
     ) +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1),
-    legend.position = "bottom"
+    legend.position = "right"
     )
 
-aisle_plot / top_10_aisle
+gridExtra::grid.arrange(aisle_plot, top_10_aisle, heights = c(1, 1), nrow = 2 )
 ```
 
 
