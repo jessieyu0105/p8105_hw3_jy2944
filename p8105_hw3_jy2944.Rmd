@@ -293,7 +293,7 @@ top_10_aisle = insta_new[c(1:10), ] %>%
     legend.position = "right"
     )
 
-gridExtra::grid.arrange(aisle_plot, top_10_aisle, heights = c(3, 3), nrow = 2 )
+gridExtra::grid.arrange(aisle_plot, top_10_aisle, heights = c(6, 4), nrow = 2 )
 ```
 
 
