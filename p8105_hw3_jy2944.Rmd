@@ -312,14 +312,38 @@ As to Coffee Ice Cream, the mean hour for it to be ordered is between noon and 4
 
 This problem uses the NY NOAA data.
 
-Load data
+### Exploration of the dataset
 
-```{r}
+```{r collapse = TRUE}
+# load data
 noaa_data = as.tibble(ny_noaa) %>%
   janitor::clean_names()
+
+# look at the data
+skimr::skim(noaa_data)
+
+# percent of missing data in precipitation (%)
+(sum(is.na(noaa_data$prcp)) / nrow(noaa_data)) * 100
+# percent of missing data in snowfall (%)
+(sum(is.na(noaa_data$snow)) / nrow(noaa_data)) * 100
+# percent of missing data in snow depth (%)
+(sum(is.na(noaa_data$snwd)) / nrow(noaa_data)) * 100
+# percent of missing data in maximum temperature (%)
+(sum(is.na(noaa_data$tmax)) / nrow(noaa_data)) * 100
+# percent of missing data in minimum temperature (%)
+(sum(is.na(noaa_data$tmin)) / nrow(noaa_data)) * 100
+
+# find the number of observations which are missing at least one variable
+noaa_data %>% 
+  filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% 
+  nrow()
+# the percent of observations which have missing data (%)
+((noaa_data %>% filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% nrow()) / nrow(noaa_data)) * 100
 ```
 
-### Description
+This dataset contains daily weather information observed by each New York state weather station from January 1, 1981 through December 31, 2010. It is consisted by `r nrow(noaa_data)` observations with information across `r ncol(noaa_data)` variables. Key variables include the date of observation, precipitation (tenths of mm), snowfall (mm), maximum temperature (tenths of degrees centigrade), and minimum temperature (tenths of degrees centigrade).
+
+One big issue of this dataset is that it contains extensive missing data. In variable precipitation, snowfall, snow depth, maximum temperature, and minimum temperature, the missing data accounts for `r round((sum(is.na(noaa_data$prcp)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$snow)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$snwd)) / nrow(noaa_data)) * 100, 2)`%, `r round((sum(is.na(noaa_data$tmax)) / nrow(noaa_data)) * 100, 2)`%, and `r round((sum(is.na(noaa_data$tmin)) / nrow(noaa_data)) * 100, 2)`%, respectively. There are `r noaa_data %>% filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% nrow()` observations are missing at least information of one weather variable, which accounts for `r round(((noaa_data %>% filter(is.na(prcp) | is.na(snow) | is.na(snwd) | is.na(tmax) | is.na(tmin)) %>% nrow()) / nrow(noaa_data)) * 100, 2)`% of the all observations (over a half).
 
 
 ### Answers based on the dataset
