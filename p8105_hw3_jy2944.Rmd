@@ -305,8 +305,7 @@ instacart_data %>%
   knitr::kable(digits = 2)
 ```
 
-As to Coffee Ice Cream, the mean hour for it to be ordered is highest on Tuesday (15.38 hours), and lowest on Friday (12.26 hours). As to Pink Lady Apples, the mean hour for it to be ordered is highest on Wednesday (14.25 hours), and lowest on Monday (11.36 hours).
-
+As to Coffee Ice Cream, the mean hour for it to be ordered is between noon and 4 p.m across the week. As to Pink Lady Apples, the mean hour for it to be ordered is between 11 a.m. and 3 p.m. across the week.
 
 
 # Problem 3
